@@ -42,7 +42,7 @@ export function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-10 h-10 overflow-hidden rounded-lg border border-border/50 group-hover:border-primary/50 transition-all duration-300 group-hover:scale-105 shadow-sm">
             <Image
-              src="/images/logo.jpg"
+              src="/images/logo.png"
               alt="Faris Hamad Logo"
               fill
               className="object-cover"
@@ -129,7 +129,7 @@ export function Navbar() {
               <SheetHeader className="text-left">
                 <div className="relative w-12 h-12 overflow-hidden rounded-xl border border-border/50 mb-4 shadow-sm">
                   <Image
-                    src="/images/logo.jpg"
+                    src="/images/logo.png"
                     alt="Logo"
                     fill
                     className="object-cover"
