@@ -13,7 +13,7 @@ export default function Home() {
       <Projects />
       <Contact />
 
-      <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border/50 bg-background/50 backdrop-blur-sm">
+      <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border/50 bg-background md:bg-background/50 md:backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <p>
             © {new Date().getFullYear()} Portfolio. Built with Next.js,
