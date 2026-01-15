@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { Skills } from "@/components/Skills";
 import { Projects } from "@/components/Projects";
 import { Contact } from "@/components/Contact";
+import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -12,15 +13,7 @@ export default function Home() {
       <Skills />
       <Projects />
       <Contact />
-
-      <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border/50 bg-background md:bg-background/50 md:backdrop-blur-sm">
-        <div className="container mx-auto px-4">
-          <p>
-            © {new Date().getFullYear()} Portfolio. Built with Next.js,
-            Tailwind, and Shadcn UI.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

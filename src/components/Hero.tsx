@@ -40,7 +40,10 @@ const FloatingIcon = ({
   </motion.div>
 );
 
+import { useLanguage } from "@/lib/LanguageContext";
+
 export function Hero() {
+  const { t, language } = useLanguage();
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
       {/* Background Gradients */}
@@ -78,7 +81,7 @@ export function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            Available for work
+            {t.hero.badge}
           </span>
         </motion.div>
 
@@ -88,7 +91,7 @@ export function Hero() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-black dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-b dark:from-white dark:to-white/50"
         >
-          Faris Hamad
+          {t.hero.title}
           <br />{" "}
           <motion.span
             initial={{ opacity: 0, x: -20 }}
@@ -96,7 +99,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-4xl md:text-6xl lg:text-7xl bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text text-transparent"
           >
-            Building Digital Excellence
+            {t.hero.subtitle}
           </motion.span>
         </motion.h1>
 
@@ -106,14 +109,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed"
         >
-          Hi, I'm a{" "}
-          <span className="text-primary font-bold">Full Stack Developer</span>{" "}
-          based in Sudan, passionate about building high-performance web
-          applications using
-          <span className="text-foreground font-semibold"> Next.js</span>,
-          <span className="text-foreground font-semibold"> TypeScript</span>,
-          and
-          <span className="text-foreground font-semibold"> Firebase</span>.
+          {t.hero.description}
         </motion.p>
 
         <motion.div
@@ -128,8 +124,10 @@ export function Hero() {
             asChild
           >
             <a href="#projects">
-              View My Projects{" "}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {t.hero.viewProjects}{" "}
+              <ArrowRight
+                className={`w-5 h-5 transition-transform ${language === "ar" ? "rotate-180 group-hover:-translate-x-1" : "group-hover:translate-x-1"}`}
+              />
             </a>
           </Button>
           <Button
@@ -143,7 +141,7 @@ export function Hero() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Github className="w-5 h-5" /> GitHub
+              <Github className="w-5 h-5" /> {t.hero.github}
             </a>
           </Button>
         </motion.div>

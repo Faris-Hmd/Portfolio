@@ -61,7 +61,29 @@ const cardVariants = {
   },
 };
 
+import { useLanguage } from "@/lib/LanguageContext";
+
 export function Projects() {
+  const { t } = useLanguage();
+
+  const translatedProjects = [
+    {
+      ...projects[0],
+      title: t.projects.items.liperPizza.title,
+      description: t.projects.items.liperPizza.description,
+    },
+    {
+      ...projects[1],
+      title: t.projects.items.lpDashboard.title,
+      description: t.projects.items.lpDashboard.description,
+    },
+    {
+      ...projects[2],
+      title: t.projects.items.lpDriver.title,
+      description: t.projects.items.lpDriver.description,
+    },
+  ];
+
   return (
     <section id="projects" className="py-24 bg-muted/20 mt-4 overflow-hidden">
       <div className="container mx-auto px-4">
@@ -73,10 +95,10 @@ export function Projects() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Featured Projects
+            {t.projects.title}
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Highlighting my expertise in building scalable web applications.
+          <p className="text-muted-foreground max-xl mx-auto">
+            {t.projects.subtitle}
           </p>
         </motion.div>
 
@@ -87,20 +109,20 @@ export function Projects() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
         >
-          {projects.map((project, i) => (
+          {translatedProjects.map((project, i) => (
             <motion.div key={i} variants={cardVariants}>
               <Card className="flex flex-col h-full hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 border-border/50 bg-card md:bg-card/50 md:backdrop-blur-md group hover:-translate-y-3 overflow-hidden relative">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-400 to-cyan-300 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-400 to-cyan-300 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 rtl:origin-right" />
                 <CardHeader>
-                  <CardTitle className="group-hover:text-primary transition-colors text-xl">
+                  <CardTitle className="group-hover:text-primary transition-colors text-xl text-left rtl:text-right">
                     {project.title}
                   </CardTitle>
-                  <CardDescription className="text-muted-foreground/90 leading-relaxed">
+                  <CardDescription className="text-muted-foreground/90 leading-relaxed text-left rtl:text-right">
                     {project.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 justify-start rtl:justify-start">
                     {project.tags.map((tag) => (
                       <Badge
                         key={tag}
@@ -112,14 +134,14 @@ export function Projects() {
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter className="gap-3 pt-6 flex ">
+                <CardFooter className="gap-3 pt-6 flex justify-start rtl:justify-start">
                   <Button size="sm" variant="outline" className="gap-2" asChild>
                     <a
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Github className="w-4 h-4" /> Source
+                      <Github className="w-4 h-4" /> {t.projects.source}
                     </a>
                   </Button>
                   <Button size="sm" className="gap-2" asChild>
@@ -128,7 +150,7 @@ export function Projects() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <ExternalLink className="w-4 h-4" /> Live Demo
+                      <ExternalLink className="w-4 h-4" /> {t.projects.demo}
                     </a>
                   </Button>
                 </CardFooter>

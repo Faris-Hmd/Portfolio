@@ -16,9 +16,13 @@ import { Moon, Sun, Github } from "lucide-react";
 
 import Image from "next/image";
 
+import { useLanguage } from "@/lib/LanguageContext";
+import { Languages } from "lucide-react";
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const { theme, setTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -49,7 +53,8 @@ export function Navbar() {
             />
           </div>
           <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">
-            Faris<span className="text-foreground">.</span>
+            {t.hero.title.split(" ")[0]}
+            <span className="text-foreground">.</span>
           </span>
         </Link>
 
@@ -59,36 +64,47 @@ export function Navbar() {
             href="#skills"
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
-            Skills
+            {t.nav.skills}
           </Link>
           <Link
             href="#projects"
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
-            Projects
+            {t.nav.projects}
           </Link>
           <Link
             href="#contact"
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
-            Contact
+            {t.nav.contact}
           </Link>
 
-          <div className="flex items-center gap-4 border-l pl-4 border-border/50">
+          <div className="flex items-center gap-4 border-l pl-4 border-border/50 rtl:border-l-0 rtl:pl-0 rtl:border-r rtl:pr-4">
             {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-[1.2rem] w-[1.2rem]" />
-                ) : (
-                  <Moon className="h-[1.2rem] w-[1.2rem]" />
-                )}
-                <span className="sr-only">Toggle theme</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+                  className="rounded-full w-9 h-9"
+                  title={language === "en" ? "العربية" : "English"}
+                >
+                  <Languages className="h-[1.1rem] w-[1.1rem]" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="rounded-full w-9 h-9"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-[1.1rem] w-[1.1rem]" />
+                  ) : (
+                    <Moon className="h-[1.1rem] w-[1.1rem]" />
+                  )}
+                  <span className="sr-only">Toggle theme</span>
+                </Button>
+              </div>
             )}
             <Button
               variant="default"
@@ -96,7 +112,7 @@ export function Navbar() {
               className="rounded-full px-6"
               asChild
             >
-              <Link href="#contact">Hire Me</Link>
+              <Link href="#contact">{t.nav.hireMe}</Link>
             </Button>
           </div>
         </nav>
@@ -104,19 +120,28 @@ export function Navbar() {
         {/* Mobile Nav */}
         <div className="flex items-center gap-2 md:hidden">
           {mounted && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-full"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-[1.2rem] w-[1.2rem]" />
-              ) : (
-                <Moon className="h-[1.2rem] w-[1.2rem]" />
-              )}
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+                className="rounded-full w-9 h-9"
+              >
+                <Languages className="h-[1.1rem] w-[1.1rem]" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="rounded-full w-9 h-9"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-[1.1rem] w-[1.1rem]" />
+                ) : (
+                  <Moon className="h-[1.1rem] w-[1.1rem]" />
+                )}
+              </Button>
+            </div>
           )}
 
           <Sheet>
@@ -125,8 +150,11 @@ export function Navbar() {
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <SheetHeader className="text-left">
+            <SheetContent
+              side={language === "ar" ? "left" : "right"}
+              className="w-[300px] sm:w-[400px] p-8 flex flex-col"
+            >
+              <SheetHeader className="text-left rtl:text-right">
                 <div className="relative w-12 h-12 overflow-hidden rounded-xl border border-border/50 mb-4 shadow-sm">
                   <Image
                     src="/images/logo.png"
@@ -136,7 +164,7 @@ export function Navbar() {
                   />
                 </div>
                 <SheetTitle className="text-2xl font-bold">
-                  Faris Hamad
+                  {t.hero.title}
                 </SheetTitle>
                 <SheetDescription className="text-muted-foreground">
                   Full Stack Developer
@@ -148,25 +176,25 @@ export function Navbar() {
                   href="#skills"
                   className="flex items-center gap-2 text-lg font-medium p-2 rounded-md hover:bg-muted transition-colors transition-all active:scale-95"
                 >
-                  Skills
+                  {t.nav.skills}
                 </Link>
                 <Link
                   href="#projects"
                   className="flex items-center gap-2 text-lg font-medium p-2 rounded-md hover:bg-muted transition-colors transition-all active:scale-95"
                 >
-                  Projects
+                  {t.nav.projects}
                 </Link>
                 <Link
                   href="#contact"
                   className="flex items-center gap-2 text-lg font-medium p-2 rounded-md hover:bg-muted transition-colors transition-all active:scale-95"
                 >
-                  Contact
+                  {t.nav.contact}
                 </Link>
               </div>
 
-              <div className="mt-auto items-center flex flex-col gap-6 pb-8">
+              <div className="mt-auto items-center flex flex-col gap-6">
                 <Button className="w-full" size="lg" asChild>
-                  <Link href="#contact">Hire Me</Link>
+                  <Link href="#contact">{t.nav.hireMe}</Link>
                 </Button>
                 <div className="flex justify-center gap-4">
                   <Button
