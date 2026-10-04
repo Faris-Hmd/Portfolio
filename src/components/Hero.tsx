@@ -1,149 +1,111 @@
 "use client";
-import { motion } from "framer-motion";
+
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "./ui/button";
-import {
-  ArrowRight,
-  Github,
-  Code2,
-  Database,
-  Globe,
-  Smartphone,
-  Coffee,
-} from "lucide-react";
-
-const FloatingIcon = ({
-  icon: Icon,
-  className,
-  delay,
-}: {
-  icon: any;
-  className: string;
-  delay: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0 }}
-    animate={{
-      opacity: [0.2, 0.5, 0.2],
-      scale: 1,
-      y: [0, -20, 0],
-      rotate: [0, 10, -10, 0],
-    }}
-    transition={{
-      duration: 5,
-      delay,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-    className={`absolute hidden lg:block text-primary/20 ${className}`}
-  >
-    <Icon size={48} />
-  </motion.div>
-);
-
-import { useLanguage } from "@/lib/LanguageContext";
-
+import { ArrowRight, Github } from "lucide-react";
 export function Hero() {
-  const { t, language } = useLanguage();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
-      {/* Background Gradients */}
-      <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] animate-pulse hidden md:block" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse delay-700 hidden md:block" />
-
-      {/* Floating Icons */}
-      <FloatingIcon icon={Code2} className="top-[20%] left-[15%]" delay={0} />
-      <FloatingIcon
-        icon={Database}
-        className="bottom-[25%] left-[20%]"
-        delay={1}
-      />
-      <FloatingIcon icon={Globe} className="top-[25%] right-[20%]" delay={2} />
-      <FloatingIcon
-        icon={Smartphone}
-        className="bottom-[20%] right-[15%]"
-        delay={3}
-      />
-      <FloatingIcon
-        icon={Coffee}
-        className="top-[10%] left-[50%] -translate-x-1/2"
-        delay={4}
+    <section
+      ref={containerRef}
+      className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-28 pb-20 z-10"
+    >
+      {/* Radial soft scrim to guarantee 100% text readability over the 3D canvas */}
+      <div
+        className="absolute inset-0 pointer-events-none -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 65% 55% at 50% 50%, hsl(var(--background) / 0.5) 0%, hsl(var(--background) / 0.25) 45%, transparent 75%)",
+        }}
       />
 
-      <div className="container mx-auto px-4 text-center z-10 flex flex-col items-center">
+      {/* Subtle ambient dot grid */}
+      <div
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none -z-10"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
+          backgroundSize: "32px 32px",
+        }}
+      />
+
+      {/* Hero Content */}
+      <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-4xl">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 p-1 bg-primary/10 md:bg-primary/5 rounded-full border border-primary/20 md:backdrop-blur-sm"
+          style={{ y: contentY, opacity }}
+          className="flex flex-col items-center text-center backdrop-blur-[2px] rounded-3xl py-4"
         >
-          <span className="flex items-center gap-2 px-4 py-1.5 text-sm font-semibold text-primary">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            {t.hero.badge}
-          </span>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-black dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-b dark:from-white dark:to-white/50"
-        >
-          {t.hero.title}
-          <br />{" "}
-          <motion.span
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-4xl md:text-6xl lg:text-7xl bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text text-transparent"
+          {/* Main Name & Title */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="space-y-4 mb-6"
           >
-            {t.hero.subtitle}
-          </motion.span>
-        </motion.h1>
+            {/* Space Telemetry Label */}
+            <div className="flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-[0.25em] text-primary/70 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+              <span>ORBITAL TELEMETRY // ONLINE</span>
+            </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed"
-        >
-          {t.hero.description}
-        </motion.p>
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05]">
+              <span className="text-foreground">Hi, I&apos;m </span>
+              <span className="bg-gradient-to-r from-primary via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+                Faris Hamad
+              </span>
+            </h1>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground/90 leading-snug">
+              Full-Stack Developer &amp; Cloud Systems Builder
+            </h2>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="flex flex-wrap gap-4 justify-center"
-        >
-          <Button
-            size="lg"
-            className="gap-2 h-14 px-10 text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-95 group"
-            asChild
+          {/* Description — focused on engineering craft & philosophy, without naming projects */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.22 }}
+            className="text-base sm:text-lg lg:text-xl text-foreground/85 dark:text-muted-foreground/95 max-w-2xl leading-relaxed mb-10 font-normal"
           >
-            <a href="#projects">
-              {t.hero.viewProjects}{" "}
-              <ArrowRight
-                className={`w-5 h-5 transition-transform ${language === "ar" ? "rotate-180 group-hover:-translate-x-1" : "group-hover:translate-x-1"}`}
-              />
-            </a>
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="gap-2 h-14 px-10 text-lg hover:bg-muted transition-all active:scale-95 border-2"
-            asChild
+            Crafting high-performance web platforms, resilient cloud architectures, and distributed systems. Focused on clean engineering, end-to-end reliability, and intuitive digital experiences.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="flex flex-wrap items-center gap-4 justify-center"
           >
-            <a
-              href="https://github.com/Faris-Hmd"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Button
+              size="lg"
+              className="h-12 px-8 text-sm font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 active:scale-95 group rounded-xl transition-all"
+              asChild
             >
-              <Github className="w-5 h-5" /> {t.hero.github}
-            </a>
-          </Button>
+              <a href="#projects">
+                View Projects
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 px-6 text-sm font-semibold border-border/80 hover:bg-muted/70 active:scale-95 rounded-xl gap-2 transition-all"
+              asChild
+            >
+              <a href="https://github.com/Faris-Hmd" target="_blank" rel="noopener noreferrer">
+                <Github className="w-4 h-4" />
+                GitHub
+              </a>
+            </Button>
+          </motion.div>
         </motion.div>
       </div>
     </section>
