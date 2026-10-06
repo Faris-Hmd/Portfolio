@@ -50,11 +50,6 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="space-y-4 mb-6"
           >
-            {/* Space Telemetry Label */}
-            <div className="flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-[0.25em] text-primary/70 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-              <span>ORBITAL TELEMETRY // ONLINE</span>
-            </div>
 
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05]">
               <span className="text-foreground">Hi, I&apos;m </span>

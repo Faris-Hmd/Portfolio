@@ -188,75 +188,95 @@ export function GlobalCanvas3D() {
     globeGroup.add(moonMesh3);
 
     // =========================================================================
-    // 4. DRIFTING SPACE CRYSTALS & SATELLITES (Cosmic Debris Floating in View)
+    // 4. DATA NODE CONSTELLATION NETWORK
     // =========================================================================
-    const crystalGroup = new THREE.Group();
-    scene.add(crystalGroup);
+    const nodeGroup = new THREE.Group();
+    scene.add(nodeGroup);
 
-    const crystals: {
-      mesh: THREE.Mesh;
-      rotSpeed: { x: number; y: number; z: number };
-      floatSpeed: number;
-      initY: number;
-    }[] = [];
-
-    const crystalGeometries = [
-      new THREE.OctahedronGeometry(0.8, 0),
-      new THREE.TetrahedronGeometry(0.7, 0),
-      new THREE.DodecahedronGeometry(0.75, 0),
-      new THREE.IcosahedronGeometry(0.65, 0),
+    // Node positions — deliberate network topology layout
+    const nodePositions: [number, number, number][] = [
+      [-16, 10, -6],
+      [-12, -8, -4],
+      [-20, 2, -10],
+      [-8, 14, -8],
+      [-14, -4, -12],
+      [15, 8, -7],
+      [18, -6, -5],
+      [12, -14, -9],
+      [20, 1, -11],
+      [8, 16, -6],
+      [-6, -18, -7],
+      [6, -16, -10],
     ];
 
-    const crystalMaterials = [
-      new THREE.MeshPhongMaterial({
-        color: isDark ? 0x0a2244 : 0xbae6fd,
-        emissive: primaryColor,
-        emissiveIntensity: isDark ? 0.4 : 0.2,
-        wireframe: true,
-      }),
-      new THREE.MeshPhongMaterial({
-        color: isDark ? 0x1e153b : 0xe0e7ff,
-        emissive: secondaryColor,
-        emissiveIntensity: isDark ? 0.35 : 0.2,
-        wireframe: true,
-      }),
-      new THREE.MeshPhongMaterial({
-        color: isDark ? 0x2d1223 : 0xfce7f3,
-        emissive: accentColor,
-        emissiveIntensity: isDark ? 0.35 : 0.2,
-        wireframe: true,
-      }),
+    // Connection pairs — which nodes are linked by beams
+    const nodeConnections: [number, number][] = [
+      [0, 3], [0, 2], [1, 4], [2, 4],
+      [3, 9], [5, 6], [5, 8], [6, 7],
+      [7, 11], [8, 9], [1, 10], [10, 11],
+      [0, 5], [4, 7], [3, 8],
     ];
 
-    // Spawn 8 geometric satellites drifting at varied coordinates
-    const crystalConfigs = [
-      { x: -18, y: 12, z: -8, geo: 0, mat: 0 },
-      { x: 19, y: 10, z: -10, geo: 1, mat: 1 },
-      { x: -16, y: -12, z: -5, geo: 2, mat: 2 },
-      { x: 17, y: -14, z: -6, geo: 0, mat: 0 },
-      { x: -22, y: 0, z: -12, geo: 3, mat: 1 },
-      { x: 21, y: 2, z: -14, geo: 1, mat: 2 },
-      { x: -8, y: 18, z: -10, geo: 2, mat: 0 },
-      { x: 10, y: -20, z: -8, geo: 0, mat: 1 },
-    ];
+    const nodeColors = [primaryColor, secondaryColor, goldColor];
 
-    crystalConfigs.forEach((cfg) => {
-      const mesh = new THREE.Mesh(
-        crystalGeometries[cfg.geo],
-        crystalMaterials[cfg.mat]
-      );
-      mesh.position.set(cfg.x, cfg.y, cfg.z);
-      crystalGroup.add(mesh);
-      crystals.push({
-        mesh,
-        rotSpeed: {
-          x: (Math.random() - 0.5) * 0.02,
-          y: (Math.random() - 0.5) * 0.02,
-          z: (Math.random() - 0.5) * 0.015,
-        },
-        floatSpeed: 0.5 + Math.random() * 0.8,
-        initY: cfg.y,
+    // Glow node sphere geometry (shared)
+    const nodeGeo = new THREE.SphereGeometry(0.22, 12, 12);
+    // Outer halo ring geometry (shared)
+    const haloNodeGeo = new THREE.RingGeometry(0.35, 0.48, 16);
+
+    const dataNodes: { sphere: THREE.Mesh; halo: THREE.Mesh; initPos: THREE.Vector3; floatSpeed: number }[] = [];
+
+    nodePositions.forEach((pos, i) => {
+      const color = nodeColors[i % nodeColors.length];
+
+      // Glowing core sphere
+      const nodeMat = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: isDark ? 0.95 : 0.85,
       });
+      const sphere = new THREE.Mesh(nodeGeo, nodeMat);
+      sphere.position.set(pos[0], pos[1], pos[2]);
+      nodeGroup.add(sphere);
+
+      // Subtle halo ring around each node
+      const haloMat = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: isDark ? 0.25 : 0.15,
+        side: THREE.DoubleSide,
+      });
+      const halo = new THREE.Mesh(haloNodeGeo, haloMat);
+      halo.position.copy(sphere.position);
+      nodeGroup.add(halo);
+
+      dataNodes.push({
+        sphere,
+        halo,
+        initPos: new THREE.Vector3(pos[0], pos[1], pos[2]),
+        floatSpeed: 0.4 + Math.random() * 0.5,
+      });
+    });
+
+    // Connection beams between nodes
+    const beamMat = new THREE.LineBasicMaterial({
+      color: primaryColor,
+      transparent: true,
+      opacity: isDark ? 0.18 : 0.12,
+    });
+    const beamLines: THREE.Line[] = [];
+
+    nodeConnections.forEach(([a, b]) => {
+      const posA = nodePositions[a];
+      const posB = nodePositions[b];
+      const pts = [
+        new THREE.Vector3(posA[0], posA[1], posA[2]),
+        new THREE.Vector3(posB[0], posB[1], posB[2]),
+      ];
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+      const line = new THREE.Line(lineGeo, beamMat);
+      nodeGroup.add(line);
+      beamLines.push(line);
     });
 
     // =========================================================================
@@ -481,16 +501,40 @@ export function GlobalCanvas3D() {
       );
       moonMesh3.rotation.z += 0.03;
 
-      // Animate Drifting Deep-Space Satellites / Crystals
-      crystals.forEach((item, idx) => {
-        item.mesh.rotation.x += item.rotSpeed.x;
-        item.mesh.rotation.y += item.rotSpeed.y;
-        item.mesh.rotation.z += item.rotSpeed.z;
-        item.mesh.position.y =
-          item.initY + Math.sin(elapsedTime * item.floatSpeed + idx) * 0.8;
+      // Animate Data Node Constellation
+      dataNodes.forEach((node, idx) => {
+        // Gentle floating drift
+        const floatY = Math.sin(elapsedTime * node.floatSpeed + idx * 1.2) * 0.6;
+        const floatX = Math.cos(elapsedTime * node.floatSpeed * 0.7 + idx) * 0.3;
+        node.sphere.position.x = node.initPos.x + floatX;
+        node.sphere.position.y = node.initPos.y + floatY;
+        node.halo.position.copy(node.sphere.position);
+
+        // Halo always faces camera
+        node.halo.lookAt(camera.position);
+
+        // Pulse opacity on halos
+        const pulse = 0.15 + Math.sin(elapsedTime * 2 + idx * 0.8) * 0.1;
+        (node.halo.material as THREE.MeshBasicMaterial).opacity = pulse;
       });
-      crystalGroup.position.x = -targetMouseX * 1.5;
-      crystalGroup.position.y = targetMouseY * 1.2;
+
+      // Update beam positions to follow floating nodes
+      nodeConnections.forEach(([a, b], idx) => {
+        const line = beamLines[idx];
+        if (!line) return;
+        const posArr = line.geometry.attributes.position.array as Float32Array;
+        posArr[0] = dataNodes[a].sphere.position.x;
+        posArr[1] = dataNodes[a].sphere.position.y;
+        posArr[2] = dataNodes[a].sphere.position.z;
+        posArr[3] = dataNodes[b].sphere.position.x;
+        posArr[4] = dataNodes[b].sphere.position.y;
+        posArr[5] = dataNodes[b].sphere.position.z;
+        line.geometry.attributes.position.needsUpdate = true;
+      });
+
+      // Parallax shift on mouse
+      nodeGroup.position.x = -targetMouseX * 1.2;
+      nodeGroup.position.y = targetMouseY * 0.9;
 
       // Gentle Globe Breathing
       const breathe = 1 + Math.sin(elapsedTime * 1.4) * 0.02;
@@ -536,8 +580,14 @@ export function GlobalCanvas3D() {
       moonMat2.dispose();
       moonGeo3.dispose();
       moonMat3.dispose();
-      crystalGeometries.forEach((g) => g.dispose());
-      crystalMaterials.forEach((m) => m.dispose());
+      nodeGeo.dispose();
+      haloNodeGeo.dispose();
+      beamMat.dispose();
+      dataNodes.forEach((n) => {
+        (n.sphere.material as THREE.Material).dispose();
+        (n.halo.material as THREE.Material).dispose();
+      });
+      beamLines.forEach((l) => l.geometry.dispose());
       particleGeo.dispose();
       particleMat.dispose();
       renderer.dispose();

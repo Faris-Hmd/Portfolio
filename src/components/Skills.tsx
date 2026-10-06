@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import dynamic from "next/dynamic";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Layers,
   Server,
@@ -89,6 +87,23 @@ function BentoSkillCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -102,21 +117,23 @@ function BentoSkillCard({
   const PillarIcon = pillar.icon;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 35 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
+    <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`relative rounded-3xl border border-border/70 bg-card/85 dark:bg-card/65 backdrop-blur-xl p-7 sm:p-9 overflow-hidden shadow-xl transition-all duration-300 group ${pillar.border} hover:shadow-2xl hover:shadow-primary/5`}
+      className={`relative rounded-3xl border border-border/70 bg-card/85 dark:bg-card/65 backdrop-blur-xl p-7 sm:p-9 overflow-hidden shadow-xl group ${pillar.border} hover:shadow-2xl hover:shadow-primary/5`}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "translateY(0)" : "translateY(30px)",
+        transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`,
+        willChange: isVisible ? "auto" : "opacity, transform",
+      }}
     >
       {/* Dynamic Cursor Spotlight */}
       {isHovered && (
         <div
-          className="pointer-events-none absolute -inset-px rounded-3xl transition-opacity duration-300 -z-0"
+          className="pointer-events-none absolute -inset-px rounded-3xl -z-0"
           style={{
             background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(56, 189, 248, 0.1), transparent 70%)`,
           }}
@@ -155,7 +172,7 @@ function BentoSkillCard({
           return (
             <div
               key={skill.name}
-              className="flex items-center justify-between p-3.5 rounded-2xl border border-border/40 bg-background/40 hover:bg-background/80 hover:border-primary/30 transition-all group/item"
+              className="flex items-center justify-between p-3.5 rounded-2xl border border-border/40 bg-background/40 hover:bg-background/80 hover:border-primary/30 transition-colors group/item"
             >
               <div className="flex items-center gap-3">
                 <SkillIcon className="w-4 h-4 text-primary/80 group-hover/item:text-primary transition-colors flex-shrink-0" />
@@ -170,33 +187,19 @@ function BentoSkillCard({
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 export function Skills() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-  const yOffset = useTransform(scrollYProgress, [0, 1], [30, -30]);
-
   return (
     <section
       id="stack"
-      ref={containerRef}
       className="py-32 relative overflow-hidden bg-transparent z-10"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
         {/* Section Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl mb-16 text-left"
-        >
+        <div className="max-w-3xl mb-16 text-left">
           <span className="text-xs font-mono uppercase tracking-widest text-primary font-semibold mb-2 block">
             Capabilities
           </span>
@@ -206,14 +209,14 @@ export function Skills() {
           <p className="mt-4 text-base sm:text-lg text-muted-foreground leading-relaxed">
             Technologies and architectural patterns I deploy to build resilient cloud software and distributed systems.
           </p>
-        </motion.div>
+        </div>
 
         {/* Bento Grid */}
-        <motion.div style={{ y: yOffset }} className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {PILLARS.map((pillar, idx) => (
             <BentoSkillCard key={pillar.title} pillar={pillar} index={idx} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
